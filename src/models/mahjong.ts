@@ -7,23 +7,36 @@ export interface Tile {
   id: string; // 唯一标识，方便前端渲染 (比如 "DOT-5-1" 表示第一张五筒)
 }
 
-// 玩家可选的操作动作
-export type ActionType = "DISCARD" | "PUNG" | "KONG" | "LIANG_DAO" | "HU";
+// 游戏阶段
+export type GamePhase = 'WAITING' | 'PLAYING' | 'FINISHED';
 
-export interface TrainingSession {
-  hand: Tile[]; // 当前手牌
-  discarded: Tile[]; // 玩家打出的牌
-  isLiangDao: boolean; // 玩家是否处于“亮倒”状态
-  availableActions: ActionType[]; // 玩家当前可执行的合法动作
+// 玩家角色
+export type PlayerRole = 'opponent1' | 'opponent2' | 'player';
 
-  // 引擎计算出的最优决策
-  recommendedAction: ActionType;
-  recommendedTile?: Tile; // 如果是 DISCARD，推荐打哪张
+// 单个玩家状态
+export interface PlayerState {
+  role: PlayerRole;
+  name: string;
+  hand: Tile[];       // 当前手牌
+  discards: Tile[];   // 弃牌堆
+}
 
-  shanten: number; // 向听数 (当前距离胡牌还差几张)
-  responseTime: number; // 玩家思考耗时 (ms)
+// 一次出牌记录
+export interface TurnRecord {
+  playerRole: PlayerRole;
+  drawnTile: Tile | null;
+  discardedTile: Tile;
+  roundNum: number;
+}
 
-  // 卡五星专属判定标识
-  hasKaWuXingPotential: boolean; // 是否具备“卡五星”潜力
-  canLiangDao: boolean; // 当前是否满足“亮倒”条件（需达到听牌状态 shanten === 0）
+// 整局游戏状态
+export interface GameState {
+  phase: GamePhase;
+  players: [PlayerState, PlayerState, PlayerState]; // [opponent1, opponent2, player]
+  deck: Tile[];
+  currentTurn: PlayerRole;
+  roundNum: number;          // 当前巡目（玩家出牌后+1）
+  turnHistory: TurnRecord[];
+  winner: PlayerRole | null; // null=流局或未结束
+  winningHand: Tile[] | null;
 }
