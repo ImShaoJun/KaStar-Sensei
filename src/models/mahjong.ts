@@ -7,6 +7,28 @@ export interface Tile {
   id: string; // 唯一标识，方便前端渲染 (比如 "DOT-5-1" 表示第一张五筒)
 }
 
+// 玩家可执行的动作
+export type ActionType = 'DISCARD' | 'PONG' | 'MING_KONG' | 'AN_KONG' | 'BU_KONG' | 'HU' | 'PASS';
+
+// 副露类型 (面前的公开组合)
+export type MeldType = 'PONG' | 'MING_KONG' | 'AN_KONG' | 'BU_KONG';
+
+// 一组副露
+export interface Meld {
+  type: MeldType;
+  tiles: Tile[];           // 组成牌
+  sourceTile?: Tile;       // 触发牌（碰/明杠来自谁打的牌）
+  sourcePlayer?: PlayerRole; // 谁打出的触发牌
+}
+
+// 等待玩家决策的动作
+export interface PendingAction {
+  player: PlayerRole;              // 谁有权操作
+  availableActions: ActionType[];  // 可执行的动作列表
+  triggerTile: Tile;               // 触发这个操作的牌
+  triggerPlayer: PlayerRole;       // 打出触发牌的玩家
+}
+
 // 游戏阶段
 export type GamePhase = 'WAITING' | 'PLAYING' | 'FINISHED';
 
@@ -19,6 +41,8 @@ export interface PlayerState {
   name: string;
   hand: Tile[];       // 当前手牌
   discards: Tile[];   // 弃牌堆
+  melds: Meld[];      // 已碰/杠的副露
+  lastDrawnTileId?: string; // 刚摸到的牌 ID，用于前端高亮
 }
 
 // 一次出牌记录
@@ -39,4 +63,6 @@ export interface GameState {
   turnHistory: TurnRecord[];
   winner: PlayerRole | null; // null=流局或未结束
   winningHand: Tile[] | null;
+  pendingAction: PendingAction | null;  // 当前是否有待决策的碰/杠/胡
+  winType: 'ZIMO' | 'DIANPAO' | null;  // 胡牌方式
 }

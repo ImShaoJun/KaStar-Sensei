@@ -38,48 +38,85 @@ function renderDotPattern(value: number) {
   );
 }
 
+const BAM_PATTERNS: Record<number, { cx: number; cy: number; color: string; scale?: number; rotate?: number }[]> = {
+  2: [
+    { cx: 50, cy: 35, color: '#16a34a', scale: 1.2 },
+    { cx: 50, cy: 95, color: '#2563eb', scale: 1.2 }
+  ],
+  3: [
+    { cx: 50, cy: 25, color: '#2563eb', scale: 1 },
+    { cx: 50, cy: 65, color: '#dc2626', scale: 1 },
+    { cx: 50, cy: 105, color: '#16a34a', scale: 1 }
+  ],
+  4: [
+    { cx: 32, cy: 35, color: '#16a34a', scale: 1.1 }, { cx: 68, cy: 35, color: '#16a34a', scale: 1.1 },
+    { cx: 32, cy: 95, color: '#2563eb', scale: 1.1 }, { cx: 68, cy: 95, color: '#2563eb', scale: 1.1 }
+  ],
+  5: [
+    { cx: 28, cy: 28, color: '#16a34a', scale: 0.9 }, { cx: 72, cy: 28, color: '#16a34a', scale: 0.9 },
+    { cx: 50, cy: 65, color: '#dc2626', scale: 1 },
+    { cx: 28, cy: 102, color: '#2563eb', scale: 0.9 }, { cx: 72, cy: 102, color: '#2563eb', scale: 0.9 }
+  ],
+  6: [
+    { cx: 25, cy: 35, color: '#16a34a', scale: 0.9 }, { cx: 50, cy: 35, color: '#16a34a', scale: 0.9 }, { cx: 75, cy: 35, color: '#16a34a', scale: 0.9 },
+    { cx: 25, cy: 95, color: '#2563eb', scale: 0.9 }, { cx: 50, cy: 95, color: '#2563eb', scale: 0.9 }, { cx: 75, cy: 95, color: '#2563eb', scale: 0.9 }
+  ],
+  7: [
+    { cx: 50, cy: 26, color: '#dc2626', scale: 0.9, rotate: 30 },
+    { cx: 25, cy: 66, color: '#16a34a', scale: 0.8 }, { cx: 50, cy: 66, color: '#16a34a', scale: 0.8 }, { cx: 75, cy: 66, color: '#16a34a', scale: 0.8 },
+    { cx: 25, cy: 106, color: '#2563eb', scale: 0.8 }, { cx: 50, cy: 106, color: '#2563eb', scale: 0.8 }, { cx: 75, cy: 106, color: '#2563eb', scale: 0.8 }
+  ],
+  8: [
+    { cx: 22, cy: 36, color: '#16a34a', scale: 0.8, rotate: 20 },
+    { cx: 40, cy: 36, color: '#16a34a', scale: 0.8, rotate: -20 },
+    { cx: 60, cy: 36, color: '#16a34a', scale: 0.8, rotate: 20 },
+    { cx: 78, cy: 36, color: '#16a34a', scale: 0.8, rotate: -20 },
+    { cx: 22, cy: 94, color: '#2563eb', scale: 0.8, rotate: 20 },
+    { cx: 40, cy: 94, color: '#2563eb', scale: 0.8, rotate: -20 },
+    { cx: 60, cy: 94, color: '#2563eb', scale: 0.8, rotate: 20 },
+    { cx: 78, cy: 94, color: '#2563eb', scale: 0.8, rotate: -20 }
+  ],
+  9: [
+    { cx: 25, cy: 25, color: '#dc2626', scale: 0.8 }, { cx: 50, cy: 25, color: '#dc2626', scale: 0.8 }, { cx: 75, cy: 25, color: '#dc2626', scale: 0.8 },
+    { cx: 25, cy: 65, color: '#2563eb', scale: 0.8 }, { cx: 50, cy: 65, color: '#2563eb', scale: 0.8 }, { cx: 75, cy: 65, color: '#2563eb', scale: 0.8 },
+    { cx: 25, cy: 105, color: '#16a34a', scale: 0.8 }, { cx: 50, cy: 105, color: '#16a34a', scale: 0.8 }, { cx: 75, cy: 105, color: '#16a34a', scale: 0.8 }
+  ]
+};
+
 function renderBamPattern(value: number) {
   if (value === 1) {
     return (
-      <text x="50" y="85" textAnchor="middle" fontSize="55" fill="#2d7d46">
-        🐦
+      <text x="50" y="85" textAnchor="middle" fontSize="60" fill="#2d7d46">
+        🦚
       </text>
     );
   }
 
-  const stickCount = value;
-  const stickW = 14;
-  const cols = stickCount <= 3 ? 1 : 2;
-  const rows = Math.ceil(stickCount / cols);
-  const colGap = 10;
-  const totalW = cols * stickW + (cols - 1) * colGap;
-  const startX = 50 - totalW / 2;
-  const availH = 110;
-  const rowH = availH / rows;
-  const startY = 10;
+  const positions = BAM_PATTERNS[value] || [];
+  return (
+    <g>
+      {positions.map((item, i) => {
+        const sc = item.scale || 1;
+        const w = 12 * sc;
+        const h = 36 * sc;
+        const x = item.cx - w / 2;
+        const y = item.cy - h / 2;
+        const rotateStr = item.rotate ? `rotate(${item.rotate}, ${item.cx}, ${item.cy})` : '';
 
-  const sticks: React.ReactElement[] = [];
-  let idx = 0;
-  for (let r = 0; r < rows && idx < stickCount; r++) {
-    const colsInRow = Math.min(cols, stickCount - idx);
-    const rowW = colsInRow * stickW + (colsInRow - 1) * colGap;
-    const rowStartX = 50 - rowW / 2;
-    for (let c = 0; c < colsInRow && idx < stickCount; c++) {
-      const x = rowStartX + c * (stickW + colGap);
-      const y = startY + r * rowH + 2;
-      const h = rowH - 6;
-      const color = idx % 2 === 0 ? '#2d7d46' : '#1a5fb4';
-      sticks.push(
-        <g key={idx}>
-          <rect x={x} y={y} width={stickW} height={h} rx={3} fill={color} />
-          <line x1={x + 1} y1={y + h * 0.33} x2={x + stickW - 1} y2={y + h * 0.33} stroke="rgba(0,0,0,0.3)" strokeWidth="1.5" />
-          <line x1={x + 1} y1={y + h * 0.66} x2={x + stickW - 1} y2={y + h * 0.66} stroke="rgba(0,0,0,0.3)" strokeWidth="1.5" />
-        </g>
-      );
-      idx++;
-    }
-  }
-  return <g>{sticks}</g>;
+        return (
+          <g key={i} transform={rotateStr}>
+            {/* 柱体背景 */}
+            <rect x={x} y={y} width={w} height={h} rx={w / 3} fill={item.color} />
+            {/* 顶下节纹 */}
+            <line x1={x + w * 0.2} y1={y + h * 0.3} x2={x + w * 0.8} y2={y + h * 0.3} stroke="rgba(255,255,255,0.4)" strokeWidth={1.5 * sc} />
+            <line x1={x + w * 0.2} y1={y + h * 0.7} x2={x + w * 0.8} y2={y + h * 0.7} stroke="rgba(255,255,255,0.4)" strokeWidth={1.5 * sc} />
+            {/* 中间高光线条 */}
+            <line x1={x + w * 0.5} y1={y + h * 0.15} x2={x + w * 0.5} y2={y + h * 0.85} stroke="rgba(0,0,0,0.3)" strokeWidth={1 * sc} />
+          </g>
+        );
+      })}
+    </g>
+  );
 }
 
 function renderDragonPattern(value: number) {
