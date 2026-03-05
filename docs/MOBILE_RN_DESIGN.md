@@ -27,8 +27,10 @@
 - ✅ 完整的 Web 版麻将对局系统 (Next.js + TypeScript)
 - ✅ 游戏引擎完整 (发牌/洗牌/胡牌判定/卡五星检测)
 - ✅ AI 教练对接 Claude API
-- ❌ AI 教练硬编码，无法切换提供商
-- ❌ 仅限 Web 平台，无法移动端使用
+- ✅ AI 教练架构重构，支持插件化 (ICoachProvider)
+- ✅ Monorepo 架构搭建完成 (npm workspaces)
+- ✅ 核心逻辑抽取为独立包 (@kastar/core-game)
+- 🚧 React Native 移动端应用已初始化 (Phase 4)
 
 ### 改造目标
 
@@ -193,57 +195,31 @@ KaStar-Sensei-Mobile/
 
 ## 改造步骤
 
-### Phase 1: Monorepo 搭建 (2-3 天)
+### Phase 1: Monorepo 搭建 (已完成 ✅)
 
-```bash
-# 初始化 pnpm workspaces
-pnpm init
+- 使用 npm workspaces 初始化 Monorepo
+- 创建 packages 和 apps 目录结构
+- 配置 tsconfig.base.json 路径映射
 
-# 创建 packages 和 apps 目录
-mkdir -p packages/{core-game,coach-api,coach-plugins,ui-components}
-mkdir -p apps/{mobile,web}
+### Phase 2: 核心抽取 (已完成 ✅)
 
-# 配置 tsconfig.base.json
-# 设置路径别名 @core-game, @coach-api 等
-```
+- 创建 `packages/core-game`
+- 移植 `GameEngine.ts` 和 `mahjong.ts`
+- Web 端已切换至引用共享包
 
-### Phase 2: 核心抽取 (3-5 天)
+### Phase 3: 教练接口抽象 (已完成 ✅)
 
-1. 创建 `packages/core-game`
-2. 复制 `GameEngine.ts` 和 `mahjong.ts`
-3. 移除 Web 相关依赖
-4. 编写单元测试 (Jest)
+- 定义 `ICoachProvider` 接口
+- 实现 `ClaudeCoach` 插件
+- Web 端 API 已适配新插件架构
 
-### Phase 3: 教练接口抽象 (2-3 天)
+### Phase 4: React Native 主应用 (进行中 🚧)
 
-```typescript
-// packages/coach-api/src/ICoachProvider.ts
-export interface ICoachProvider {
-  name: string;
-  description: string;
-  analyze: (context: DiscardContext) => Promise<CoachFeedback>;
-  warmup?: () => Promise<boolean>;
-}
-
-// packages/coach-plugins/src/ClaudeCoach.ts
-export class ClaudeCoach implements ICoachProvider {
-  name = "Claude 毒舌教练";
-  
-  async analyze(context: DiscardContext): Promise<CoachFeedback> {
-    // 复用现有 API 逻辑
-  }
-}
-```
-
-### Phase 4: React Native 主应用 (1-2 周)
-
-```bash
-# 用 Expo 初始化
-npx create-expo-app@latest apps/mobile --template blank-typescript
-
-# 安装依赖
-pnpm add react-native-svg zustand @react-native-async-storage/async-storage
-```
+- [x] 使用 Expo 初始化 `apps/mobile`
+- [x] 安装核心依赖 (SVG, Zustand, AsyncStorage)
+- [x] 成功在 RN 中调用核心引擎并渲染手牌
+- [ ] 移植 SVG 牌面组件
+- [ ] 实现核心游戏状态管理 (Zustand)
 
 **关键组件移植：**
 

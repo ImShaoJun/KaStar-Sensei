@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["esnext", "dom"],
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core-game/*": ["packages/core-game/src/*"],
+      "@coach-api/*": ["packages/coach-api/src/*"],
+      "@coach-plugins/*": ["packages/coach-plugins/src/*"],
+      "@ui-components/*": ["packages/ui-components/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/node_modules", "dist", "**/dist"]
+}
