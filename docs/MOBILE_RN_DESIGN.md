@@ -30,13 +30,14 @@
 - ✅ AI 教练架构重构，支持插件化 (ICoachProvider)
 - ✅ Monorepo 架构搭建完成 (npm workspaces)
 - ✅ 核心逻辑抽取为独立包 (@kastar/core-game)
-- 🚧 React Native 移动端应用已初始化 (Phase 4)
+- ✅ React Native 移动端应用核心功能实现 (Phase 4 完成)
+- 🚧 AI 反馈展示与设置系统已集成 (Phase 5 进行中)
 
 ### 改造目标
 
-1. **跨平台：** React Native 实现 iOS/Android 双端
-2. **可插拔教练：** 抽象 AI 教练接口，支持多种提供商
-3. **代码复用：** 最大化复用现有 TypeScript 代码
+1. **跨平台：** React Native 实现 iOS/Android 双端 (完成基础框架)
+2. **可插拔教练：** 抽象 AI 教练接口，支持多种提供商 (已定义接口，支持 Mock 反馈)
+3. **代码复用：** 最大化复用现有 TypeScript 代码 (复用率约 70%)
 4. **离线支持：** 可选本地 AI 模型 (未来扩展)
 
 ---
@@ -213,13 +214,13 @@ KaStar-Sensei-Mobile/
 - 实现 `ClaudeCoach` 插件
 - Web 端 API 已适配新插件架构
 
-### Phase 4: React Native 主应用 (进行中 🚧)
+### Phase 4: React Native 主应用 (已完成 ✅)
 
 - [x] 使用 Expo 初始化 `apps/mobile`
 - [x] 安装核心依赖 (SVG, Zustand, AsyncStorage)
 - [x] 成功在 RN 中调用核心引擎并渲染手牌
-- [ ] 移植 SVG 牌面组件
-- [ ] 实现核心游戏状态管理 (Zustand)
+- [x] 移植 SVG 牌面组件 (@kastar/ui-components)
+- [x] 实现核心游戏状态管理 (Zustand `gameStore.ts`)
 
 **关键组件移植：**
 
@@ -236,7 +237,13 @@ export default function MahjongTile({ tile, size, onPress }) {
 }
 ```
 
-### Phase 5: 插件系统 + 设置 (3-5 天)
+### Phase 5: 插件系统 + 设置 (进行中 🚧)
+
+- [x] 实现设置界面 (`SettingsModal.tsx`)
+- [x] 集成 `AsyncStorage` 进行配置持久化
+- [x] 实现 AI 反馈展示 UI (`FeedbackCard.tsx`)
+- [ ] 接入真实的 `ICoachProvider` 插件工厂
+- [ ] 优化移动端布局与动画细节
 
 ```typescript
 // 设置界面选择教练
