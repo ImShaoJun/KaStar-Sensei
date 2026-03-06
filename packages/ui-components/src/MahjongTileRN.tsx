@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text as RNText, StyleSheet, ViewStyle } from 'react-native';
+import { View, TouchableOpacity, Text as RNText, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Svg, { G, Circle, Rect, Line, Text as SvgText, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Tile } from '@kastar/core-game/src/mahjong';
 
@@ -8,7 +8,7 @@ interface MahjongTileProps {
   size?: 'sm' | 'md' | 'lg';
   onPress?: () => void;
   disabled?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 const DOT_PATTERNS: Record<number, { cx: number; cy: number }[]> = {
@@ -132,7 +132,7 @@ export function MahjongTileRN({ tile, size = 'lg', onPress, disabled = false, st
     >
       {/* Tile shadow/depth base */}
       <View style={[styles.depth, { width, height, backgroundColor: '#8a7a62' }]} />
-      
+
       {/* Main tile face */}
       <View style={[styles.face, { width, height: height - 4 }]}>
         <Svg viewBox="0 0 100 140" width="100%" height="100%">

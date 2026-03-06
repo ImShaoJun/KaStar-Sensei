@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform,
+  StatusBar as RNStatusBar
 } from 'react-native';
-import { getPlayer } from '@kastar/core-game';
+import { getPlayer, Tile } from '@kastar/core-game';
 import { MahjongTileRN } from '@kastar/ui-components';
 import { useGameStore } from './src/store/gameStore';
 import { useSettingsStore } from './src/store/settingsStore';
@@ -18,13 +20,13 @@ import FeedbackCard from './src/components/FeedbackCard';
 
 export default function App() {
   const [settingsVisible, setSettingsVisible] = useState(false);
-  
-  const { 
-    gameState, 
-    initGame, 
-    selectedTileId, 
-    selectTile, 
-    discard, 
+
+  const {
+    gameState,
+    initGame,
+    selectedTileId,
+    selectTile,
+    discard,
     resetGame,
     isAiLoading,
     feedback,
@@ -73,49 +75,61 @@ export default function App() {
           </TouchableOpacity>
         </View>
       </View>
-      
+
       <View style={styles.board}>
         <View style={styles.opponentSection}>
           <View style={styles.opponentCard}>
-            <Text style={styles.opponentName}>对手 A</Text>
-            <Text style={styles.opponentInfo}>{opponent1.discards.length} 张弃牌</Text>
+            <View style={styles.opponentHeader}>
+              <Text style={styles.opponentName}>对手 A</Text>
+              <Text style={styles.opponentInfo}>{opponent1.hand.length}张手牌</Text>
+            </View>
+            <Text style={styles.discardLabel}>弃牌 ({opponent1.discards.length}):</Text>
+            <View style={styles.discardGridSmall}>
+              {opponent1.discards.map((t: Tile, i: number) => (
+                <MahjongTileRN key={t.id + i} tile={t} size="sm" />
+              ))}
+            </View>
           </View>
           <View style={styles.opponentCard}>
-            <Text style={styles.opponentName}>对手 B</Text>
-            <Text style={styles.opponentInfo}>{opponent2.discards.length} 张弃牌</Text>
+            <View style={styles.opponentHeader}>
+              <Text style={styles.opponentName}>对手 B</Text>
+              <Text style={styles.opponentInfo}>{opponent2.hand.length}张手牌</Text>
+            </View>
+            <Text style={styles.discardLabel}>弃牌 ({opponent2.discards.length}):</Text>
+            <View style={styles.discardGridSmall}>
+              {opponent2.discards.map((t: Tile, i: number) => (
+                <MahjongTileRN key={t.id + i} tile={t} size="sm" />
+              ))}
+            </View>
           </View>
         </View>
 
         {/* 游戏状态展示 */}
-        <View style={styles.discardPool}>
-          {isAiLoading && (
+        <View style={styles.centerStatusArea}>
+          {isAiLoading ? (
             <View style={styles.aiLoadingArea}>
-              <ActivityIndicator color="#f1c40f" />
+              <ActivityIndicator color="#f1c40f" size="large" />
               <Text style={styles.aiLoadingText}>教练正在分析您的出牌...</Text>
             </View>
-          )}
-          
-          {!isAiLoading && (
-             <>
-               <Text style={styles.poolTitle}>河 (最新出牌)</Text>
-               <View style={styles.discardGrid}>
-                {[...player.discards, ...opponent1.discards, ...opponent2.discards]
-                  .slice(-12)
-                  .map((t, i) => (
-                    <MahjongTileRN key={t.id + i} tile={t} size="sm" />
-                  ))}
-               </View>
-             </>
+          ) : (
+            <View style={styles.playerDiscardArea}>
+              <Text style={styles.poolTitle}>你的弃牌 ({player.discards.length})</Text>
+              <View style={styles.discardGrid}>
+                {player.discards.map((t: Tile, i: number) => (
+                  <MahjongTileRN key={t.id + i} tile={t} size="sm" />
+                ))}
+              </View>
+            </View>
           )}
         </View>
       </View>
 
       {/* 实时反馈组件 */}
       {showHints && feedback && (
-        <FeedbackCard 
-          rating={feedback.rating} 
-          content={feedback.content} 
-          onClose={clearFeedback} 
+        <FeedbackCard
+          rating={feedback.rating}
+          content={feedback.content}
+          onClose={clearFeedback}
         />
       )}
 
@@ -126,17 +140,13 @@ export default function App() {
           {selectedTileId && !isAiLoading && <Text style={styles.hint}>再次点击打出</Text>}
           {isAiLoading && <Text style={styles.aiHint}>教练思考中...</Text>}
         </View>
-        
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={styles.handScroll}
-        >
-          {player.hand.map((tile) => (
-            <MahjongTileRN 
-              key={tile.id} 
-              tile={tile} 
-              size="md" 
+
+        <View style={styles.handGrid}>
+          {player.hand.map((tile: Tile) => (
+            <MahjongTileRN
+              key={tile.id}
+              tile={tile}
+              size="md"
               onPress={() => handleTilePress(tile.id)}
               disabled={isAiLoading}
               style={[
@@ -145,12 +155,12 @@ export default function App() {
               ]}
             />
           ))}
-        </ScrollView>
+        </View>
       </View>
 
-      <SettingsModal 
-        visible={settingsVisible} 
-        onClose={() => setSettingsVisible(false)} 
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => setSettingsVisible(false)}
       />
 
       <StatusBar style="light" />
@@ -162,6 +172,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a2a2a',
+    paddingTop: Platform.OS === 'android' ? RNStatusBar.currentHeight : 0,
   },
   loadingContainer: {
     flex: 1,
@@ -229,23 +240,43 @@ const styles = StyleSheet.create({
     color: '#95a5a6',
     fontSize: 12,
   },
-  discardPool: {
+  opponentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  discardLabel: {
+    color: 'rgba(110, 231, 183, 0.5)', // emerald-400/50
+    fontSize: 10,
+    marginBottom: 4,
+  },
+  discardGridSmall: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    minHeight: 40,
+  },
+  centerStatusArea: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    borderRadius: 15,
-    padding: 15,
     justifyContent: 'center',
   },
+  playerDiscardArea: {
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    borderRadius: 15,
+    padding: 10,
+    minHeight: 100,
+  },
   poolTitle: {
-    color: '#7f8c8d',
+    color: 'rgba(110, 231, 183, 0.8)', // emerald-300/80
     fontSize: 12,
-    marginBottom: 10,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
   discardGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    gap: 4,
   },
   aiLoadingArea: {
     alignItems: 'center',
@@ -257,7 +288,8 @@ const styles = StyleSheet.create({
   },
   playerSection: {
     backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingVertical: 15,
+    paddingTop: 15,
+    paddingBottom: Platform.OS === 'android' ? 30 : 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -283,11 +315,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: 'italic',
   },
-  handScroll: {
+  handGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     paddingHorizontal: 15,
-    paddingBottom: 10,
-    alignItems: 'flex-end',
-    height: 100,
+    paddingBottom: 5,
+    paddingTop: 20, // Add space for the selected tile to translate up
+    gap: 4,
   },
   selectedTile: {
     transform: [{ translateY: -15 }],

@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import { 
-  createGame, 
-  GameState, 
-  getPlayer, 
-  playerDiscard, 
-  drawTile,
-  Tile 
+import {
+  createGame,
+  GameState,
+  getPlayer,
+  playerDiscard,
+  playerDraw,
+  Tile
 } from '@kastar/core-game';
 
 interface GameStore {
@@ -57,14 +57,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!state) return;
 
     const player = getPlayer(state, 'player');
-    const tile = player.hand.find(t => t.id === tileId);
+    const tile = player.hand.find((t: Tile) => t.id === tileId);
     if (!tile) return;
 
     // 1. 执行玩家出牌
     let nextState = playerDiscard(state, tile);
 
-    set({ 
-      gameState: nextState, 
+    set({
+      gameState: nextState,
       selectedTileId: null,
       isAiLoading: true, // 开始 AI 思考
       feedback: null
@@ -74,7 +74,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await new Promise(resolve => setTimeout(resolve, 1200));
 
     // 3. 生成 Mock 反馈
-    const ratings: ('S'|'A'|'B'|'C'|'F')[] = ['S', 'A', 'B', 'C', 'F'];
+    const ratings: ('S' | 'A' | 'B' | 'C' | 'F')[] = ['S', 'A', 'B', 'C', 'F'];
     const randomRating = ratings[Math.floor(Math.random() * ratings.length)];
     const mockComments = {
       'S': "这手牌打得漂亮！不愧是雀神转世，这进张稳如老狗。",
@@ -94,7 +94,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // 4. 模拟系统：如果开启了自动摸牌，则在反馈后摸牌
     if (autoDrawNext) {
-      nextState = drawTile(nextState, 'player');
+      const drawResult = playerDraw(nextState);
+      nextState = drawResult.state;
       set({ gameState: nextState });
     }
   },
