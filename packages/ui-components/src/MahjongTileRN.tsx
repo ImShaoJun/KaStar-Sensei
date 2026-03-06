@@ -134,7 +134,7 @@ export function MahjongTileRN({ tile, size = 'lg', onPress, disabled = false, st
       <View style={[styles.depth, { width, height, backgroundColor: '#8a7a62' }]} />
       
       {/* Main tile face */}
-      <View style={[styles.face, { width, height - 4 }]}>
+      <View style={[styles.face, { width, height: height - 4 }]}>
         <Svg viewBox="0 0 100 140" width="100%" height="100%">
           <Defs>
             <LinearGradient id="faceGradient" x1="0" y1="0" x2="0" y2="100%">

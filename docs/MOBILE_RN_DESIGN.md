@@ -31,11 +31,11 @@
 - ✅ Monorepo 架构搭建完成 (npm workspaces)
 - ✅ 核心逻辑抽取为独立包 (@kastar/core-game)
 - ✅ React Native 移动端应用核心功能实现 (Phase 4 完成)
-- 🚧 AI 反馈展示与设置系统已集成 (Phase 5 进行中)
+- 🚧 适配 Expo SDK 54 环境并集成设置系统 (Phase 5 进行中)
 
 ### 改造目标
 
-1. **跨平台：** React Native 实现 iOS/Android 双端 (完成基础框架)
+1. **跨平台：** React Native 实现 iOS/Android 双端 (完成基础框架，对齐 SDK 54)
 2. **可插拔教练：** 抽象 AI 教练接口，支持多种提供商 (已定义接口，支持 Mock 反馈)
 3. **代码复用：** 最大化复用现有 TypeScript 代码 (复用率约 70%)
 4. **离线支持：** 可选本地 AI 模型 (未来扩展)
