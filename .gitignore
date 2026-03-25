@@ -16,6 +16,8 @@ node_modules/
 # next.js
 /.next/
 /out/
+apps/web/.next/
+apps/web/out/
 
 # production
 /build
@@ -39,3 +41,28 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code
+.claude/
+
+# expo
+.expo/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# metro
+.metro-health-check*
+
+# logs
+*.log
+logs/
+
+# OS
+Thumbs.db
